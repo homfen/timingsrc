@@ -17,3 +17,32 @@ This implements the [Timing Object Draft Spec](https://github.com/webtiming/timi
 [sequencing](v2/sequencing)
 
 This implements tools for timed sequencing based on the Timing Object.
+
+
+### Virtual Environment
+
+- If virtualenv not installed, install it.
+
+```sh
+sudo apt-get install python3-pip
+sudo pip3 install virtualenv
+```
+
+- Initialise virtual environment in project folder
+
+```sh
+virtualenv -p python3 venv
+```
+
+- Enter virtual environment
+
+```sh
+venv/bin/activate
+```
+
+- Load dependencies
+
+```sh
+pip -r requirements.txt
+```
+
