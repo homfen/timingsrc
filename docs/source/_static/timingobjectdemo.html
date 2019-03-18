@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+  	<script src="https://webtiming.github.io/timingsrc/lib/timingsrc-v2.1.js" text="javascript"></script>
+	<script text="javascript">
+		var run = function() {
+	  		var to = new TIMINGSRC.TimingObject();
+	  		to.ready.then(function () {
+	  			let v = to.query();
+	  			console.log("hello world!", v);
+	    		document.querySelector("#demo").innerHTML = v.position;
+	  		});
+		};
+		if (document.readyState === "complete") {
+			run();
+		} else window.onload = function () {
+			run();
+		};
+	</script>
+</head>
+<body>
+	<div id="demo"></div>
+</body>
+</html>
