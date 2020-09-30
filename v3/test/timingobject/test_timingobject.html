@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <script type="module">
+
+    import TimingObject from '../../timingobject/timingobject.js';
+
+    let to;
+
+    function run() {
+        console.log("document ready");
+
+        // Hook up buttons UI
+        document.getElementById('srcplay').onclick = function () {
+            to.update({velocity:1.0});
+        };
+        document.getElementById('srcpause').onclick = function () {
+            to.update({velocity:0.0});
+        };
+        document.getElementById('srcreset').onclick = function () {
+            to.update({position: 0.0, velocity:0.0});
+        };
+        document.getElementById('srcback').onclick = function () {
+            to.update({velocity:-1.0});
+        };
+
+        // Hook up text UI
+        let srcvalue = document.getElementById('srcvalue');
+        to.on("timeupdate", function () {
+            srcvalue.innerHTML = to.query().position.toFixed(2);
+        });
+    };
+
+    /*
+        Test live flag in event args.
+        Test switching between timingsources
+    */
+
+    // timing object
+    to = new TimingObject({range:[0,10]});
+
+    // timing object
+    to.on("change", function (eArg) {
+        console.log("onchange", to.vector);
+    });
+
+    to.ready.then(function(){
+        console.log("to ready");
+    });
+
+    run();
+
+</script>
+</head>
+<body>
+<h1>Test Timingobject Range Timeout</h1>
+
+<h3>Source</h3>
+<div id="srcvalue"></div>
+<button id="srcplay">Play</button>
+<button id="srcpause">Pause</button>
+<button id="srcreset">Reset</button>
+<button id="srcback">Back</button>
+</body>
+</html>

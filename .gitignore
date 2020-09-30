@@ -1,3 +1,6 @@
 _site
 _sass
 .sass-cache
+docs/build
+node_modules/
+package-lock.json

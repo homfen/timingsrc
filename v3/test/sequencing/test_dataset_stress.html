@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <!--  main -->
+    <script type="module">
+
+        import {utils, Interval, Dataset} from '../../index.js';
+
+        const Delta = Dataset.Delta;
+        const cue_delta = Dataset.cue_delta;
+        const equals = utils.object_equals;
+
+
+        function assertTrue(val) {
+          if (!val) {
+            throw new Error("not true: " + val);
+          }
+        }
+
+        function copy_cue(cue) {
+          return {
+            key: cue.key,
+            interval: cue.interval,
+            data: cue.data
+          };
+        }
+
+        var timeit = function (func) {
+          let t0 = performance.now();
+          let result = func();
+          return [result, performance.now()-t0];
+        };
+
+        var make_sorted_ints = function (size, options) {
+          options = options || {};
+          let offset = options['offset'] || 0;
+          let numbers = [];
+          for (let i=0; i<size; i++) {
+            numbers.push(Math.floor(i+offset));
+          }
+          return numbers;
+        };
+
+        var make_sorted_floats = function (size, options) {
+          options = options || {};
+          let offset = options['offset'] || 0;
+          let numbers = [];
+          for (let i=0; i<size; i++) {
+            numbers.push(i+offset);
+          }
+          return numbers;
+        };
+
+        var make_random_ints = function (size, options) {
+          options = options || {};
+          let scale = options['scale'] || 1;
+          let offset = options['offset'] || 0;
+          return Array.from({length: size}, () => Math.floor(Math.random() * scale + offset));
+        };
+
+        var make_random_floats = function (size, options) {
+          options = options || {};
+          let scale = options['scale'] || 1;
+          let offset = options['offset'] || 0;
+          return Array.from({length: size}, () => Math.random() * scale + offset);
+        };
+
+
+        var make_singular_cues = function (size, scale) {
+          let numbers = Array.from({length: size}, () => Math.floor(Math.random() * scale));
+          return numbers.map(function (n) {
+            return {key: "key " + n.toString(), interval: new Interval(n), data: "data_" + n};
+          });
+        };
+
+        var make_remove_cues = function (size, scale) {
+          let numbers = Array.from({length: size}, () => Math.floor(Math.random() * scale));
+          return numbers.map(function (n) {
+            return {key: "key " + n.toString()};
+          });
+        };
+
+        var make_singular_cues_sorted_unique = function (size) {
+          let numbers = [];
+          for (let i=0; i<size; i++) {
+            numbers.push(i);
+          }
+          return numbers.map(function (n) {
+            return {key: n.toString(), interval: new Interval(n, n+1), data: "data_" + n};
+          });
+        };
+
+        var make_cues_from_numbers = function (numbers, options) {
+          options = options || {};
+          let op = options['op'] || "add";
+          return numbers.map(function (n) {
+            if (op == "remove") {
+              return {key: n.toString()};
+            } else {
+              return {key: n.toString(), interval: new Interval(n, n+1), data: "data_" + n};
+            }
+          });
+        };
+
+
+        var test_insert = function (size) {
+          //let cues = make_singular_cues_sorted_unique(size);
+          let cues = make_singular_cues(size, size/2);
+          let ds = new Dataset();
+          let [res, t] = timeit(function () {
+            ds.update(cues, {chaining:false});
+          });
+          console.log("add bigbatch " + size + " " + t);
+
+          // add more
+          cues = make_singular_cues(size, size/2);
+          timeit(function () {
+            ds.update(cues, {chaining:false});
+          }, "add bigbatch " + size);
+
+          ds.integrity();
+        };
+
+
+        var test_lookup_delete_stress = function (DATASIZE) {
+
+          let interval = new Interval(DATASIZE*0.25, DATASIZE*0.75);
+          let smallInterval = new Interval(DATASIZE*0.5, DATASIZE*0.5 + 50);
+
+          let ds = new Dataset();
+
+          // initialise
+          let numbers_1 = make_sorted_floats(DATASIZE);
+          let batch_1 = make_cues_from_numbers(numbers_1);
+          ds.update(batch_1, {chaining:false});
+
+          // remove cues in interval
+          [res, t] = timeit(function () {
+            return ds.lookup_delete(interval);
+          });
+          console.log("delete cues by interval", interval.toString(), " ", res.size, " ", t);
+
+          ds.clear();
+          ds.update(batch_1, {chaining:false});
+
+          // remove cues in interval
+          [res, t] = timeit(function () {
+            return ds.lookup_delete(smallInterval);
+          });
+          console.log("delete cues by smallinterval", smallInterval.toString(), " ", res.size, " ", t);
+
+        };
+
+
+        var test_main = function (DATASIZE) {
+          let ds = new Dataset();
+
+          // Lookup Intervals
+          let interval = new Interval(DATASIZE*0.25, DATASIZE*0.75);
+          let smallInterval = new Interval(DATASIZE*0.5, DATASIZE*0.5 + 10);
+
+          // insert sorted into empty Dataset
+          let numbers_1 = make_sorted_floats(DATASIZE);
+          let batch_1 = make_cues_from_numbers(numbers_1);
+          let [res, t] = timeit(function () {
+            return ds.update(batch_1, {chaining:false});
+          });
+          console.log("insert sorted sorted cues ", res.length, " into empty Dataset", t);
+
+
+          // insert small cue batch int non empty Dataset
+          let numbers_22 = make_random_floats(10, {scale:DATASIZE});
+          let batch_22 = make_cues_from_numbers(numbers_22);
+          [res, t] = timeit(function () {
+            return ds.update(batch_22, {chaining:false});
+          });
+          console.log("insert small batch random cues ", res.length, " into non-empty Dataset ", t);
+
+
+          // clear Dataset
+          [res, t] = timeit(function () {
+            return ds.clear();
+          })
+          console.log("clear ", res.length, " non-empty Dataset ", t);
+
+          ds.clear();
+
+          // insert random into empty Dataset
+          let numbers_3 = make_random_floats(DATASIZE, {scale:DATASIZE});
+          let batch_3 = make_cues_from_numbers(numbers_3);
+          [res, t] = timeit(function () {
+            return ds.update(batch_3, {chaining:false});
+          });
+          console.log("insert random cues ", res.length, " into empty Dataset ", t);
+
+          // insert sorted into non-empty Dataset
+          let numbers_2 = make_sorted_floats(DATASIZE, {offset:0.5});
+          let batch_2 = make_cues_from_numbers(numbers_2);
+          [res, t] = timeit(function () {
+            return ds.update(batch_2, {chaining:false});
+          });
+          console.log("insert batch sorted cues ", res.length, " into non-empty Dataset ", t);
+
+          ds.clear();
+
+          // initialise
+          let numbers_11 = make_sorted_floats(DATASIZE);
+          let batch_11 = make_cues_from_numbers(numbers_11);
+          ds.update(batch_11, {chaining:false});
+
+          // insert random into non-empty Dataset
+          let numbers_4 = make_random_floats(DATASIZE, {scale:DATASIZE});
+          let batch_4 = make_cues_from_numbers(numbers_4);
+          [res, t] = timeit(function () {
+            return ds.update(batch_4, {chaining:false});
+          });
+          console.log("insert random cues ", res.length, " into non-empty Dataset ", t);
+
+          /*
+          console.log("cueMap", ds._cueMap.size);
+          console.log("pointMap", ds._cueBuckets.get(10)._pointMap.size);
+          console.log("pointIndex", ds._cueBuckets.get(10)._pointIndex.array.length);
+          */
+
+          ds.clear()
+          ds.update(batch_11, {chaining:false});
+
+
+          // lookup cuepoints
+          [res, t] = timeit(function () {
+            return ds.lookup_endpoints(smallInterval);
+          });
+          console.log("lookup a few cuepoints ", smallInterval.toString(), " ", res.length, " ", t);
+
+          // lookup cuepoints
+          [res, t] = timeit(function () {
+            return ds.lookup_endpoints(interval);
+          });
+          console.log("lookup cuepoints ", interval.toString(), " ", res.length, " ", t);
+
+          // lookup cues big interval
+          [res, t] = timeit(function () {
+            return ds.lookup(interval);
+          });
+          console.log("lookup cues - big interval ", interval.toString(), " ", res.length, " ", t);
+
+          // lookup cues small interval
+          [res, t] = timeit(function () {
+            return ds.lookup(smallInterval);
+          });
+          console.log("lookup cues - small interval ", smallInterval.toString(), " ", res.length, " ", t);
+
+
+          // remove cues small interval
+          [res, t] = timeit(function () {
+            return ds.lookup_delete(smallInterval);
+          });
+          console.log("remove cues - small interval", smallInterval.toString(), " ", res.length, " ", t);
+
+          // remove cues big interval
+          [res, t] = timeit(function () {
+            return ds.lookup_delete(interval);
+          });
+          console.log("remove cues - big interval", interval.toString(), " ", res.length, " ", t);
+
+
+          ds.clear()
+
+          batch_4 = make_cues_from_numbers(numbers_4);
+          ds.update(batch_4, {chaining:false});
+
+          // remove
+          let batch_5 = numbers_4.map(n => {return {key:n.toString()}})
+
+          let half = batch_5.length/2;
+
+          let small_remove_batch = batch_5.slice(half, half + 10);
+          let big_remove_batch = batch_5.slice(0, half);
+
+          [res, t] = timeit(function () {
+            return ds.update(small_remove_batch, {chaining:false});
+          });
+          console.log("remove small batch of random cues ", res.length, " ", t);
+
+
+          [res, t] = timeit(function () {
+            return ds.update(big_remove_batch, {chaining:false});
+          });
+          console.log("remove big batch of random cues ", res.length, " ", t);
+
+
+
+          console.log("cueMap", ds._cueMap.size);
+          console.log("pointMap", ds._cueBuckets.get(10)._pointMap.size);
+          console.log("pointIndex", ds._cueBuckets.get(10)._pointIndex.array.length);
+
+
+        };
+
+
+        var run = function () {
+
+          // test_insert(1000);
+          // test_lookup_delete_stress(500);
+          test_main(100000);
+        };
+
+        if (document.readyState === "complete") run();
+        else window.onload = run;
+
+    </script>
+  </head>
+  <body>
+    <h1>Test Dataset</h1>
+  </body>
+</html>

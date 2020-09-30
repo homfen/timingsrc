@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <!--  main -->
+    <script type="module">
+
+        import * as timingsrc from '../../index.js';
+        import Schedule from '../../sequencing/schedule.js';
+
+        let to, s;
+
+        const Interval = timingsrc.Interval;
+        const endpoint = timingsrc.endpoint;
+
+        /*
+            process due cue events up until given timestamp
+        */
+        function print_endpoints(now, endpointEvents) {
+            endpointEvents.forEach(function(item){
+                let delay = now - item.tsEndpoint[0];
+                let str = [
+                    `${endpoint.toString(item.endpoint)}`,
+                    `key: ${item.cue.key}`,
+                    `delay: ${delay.toFixed(3)}`,
+                    `dir: ${item.direction}`
+                    ].join(" ");
+                console.log(str);
+            });
+        }
+
+
+        function run(){
+
+          const ds = new timingsrc.Dataset();
+
+          // fill ds with some cues
+          let cues = [];
+          for (let i=0; i<100; i++) {
+            let j0 = i;
+            let j1 = i + 1;
+            cues.push({key: i, interval: new Interval(j0, j1)});
+          }
+          for (let i=0; i<100; i++) {
+            let j0 = i + 0.5;
+            let j1 = j0 + 1;
+            cues.push({key: 1000 + i, interval: new Interval(j0, j1)});
+          }
+          ds.update(cues);
+
+
+          to = new timingsrc.TimingObject();
+          s = new Schedule(ds, to);
+          s.add_callback(function(now, endpointEvents) {
+            print_endpoints(now, endpointEvents);
+          });
+
+          to.on("change", function() {
+            s.setVector(to.vector);
+          });
+
+          // Hook up buttons UI
+          document.getElementById('play').onclick = function () {
+            to.update({velocity:1.0});
+          };
+          document.getElementById('pause').onclick = function () {
+            to.update({velocity:0.0});
+          };
+          document.getElementById('reset').onclick = function () {
+            to.update({position: 0.0, velocity: 0.0});
+          };
+          document.getElementById('back').onclick = function () {
+            to.update({velocity: -1.0});
+          };
+
+          // Hook up text UI
+          var value = document.getElementById('value');
+          to.on("timeupdate", function () {
+            value.innerHTML = to.query().position.toFixed(2);
+          });
+
+        }
+
+        if (document.readyState === "complete") run();
+        else window.onload = run;
+
+    </script>
+  </head>
+  <body>
+    <h1>Test Schedule</h1>
+    <div id="value"></div>
+    <button id="play">Play</button>
+    <button id="pause">Pause</button>
+    <button id="reset">Reset</button>
+    <button id="back">Back</button>
+  </body>
+</html>
