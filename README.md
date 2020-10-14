@@ -1,5 +1,20 @@
 # timingsrc
 
+### Updates:
+
+add interval option to control timeupdate interval
+
+```
+const timing = new TimingObject({
+  position: 0,
+  velocity: 0,
+  acceleration: 0,
+  range: [0, 0],
+  interval: 20 // 20ms
+});
+
+```
+
 Web Documentation for timingsrc available at [http://webtiming.github.io/timingsrc/](http://webtiming.github.io/timingsrc/)
 
 Timingsrc includes source code and documentation for timing related libraries managed by [Multi-Device Timing Community Group](https://www.w3.org/community/webtiming/)
@@ -18,9 +33,7 @@ This implements the [Timing Object Draft Spec](https://github.com/webtiming/timi
 
 This implements tools for timed sequencing based on the Timing Object.
 
-
 ### Compile Timingsrc v3
-
 
 Install Node and NPM (Node Packet Manager)
 
@@ -54,19 +67,18 @@ curl -sL https://deb.nodesource.com/setup_14.x | sudo -E bash -
 sudo apt-get install -y nodejs
 ```
 
-
 #### Install Package Dependencies
 
 - Bundler: [Rollup](https://rollupjs.org/guide/en/).
 - Script Minifier: [Terser](https://terser.org/)
 - Bundler Plugin: [Rollup-Plugin-Terser](https://www.npmjs.com/package/rollup-plugin-terser)
 
-
 Rollup needs global install so that it may be used by the compile.py script.
 
 ```sh
 npm install --global rollup
 ```
+
 Then go ahead and install the rest from package.json
 
 ```sh
@@ -87,7 +99,8 @@ npm install rollup-plugin-terser
 ```sh
 python3 compile.py v3
 ```
-Build puts new files in *docs/lib*
+
+Build puts new files in _docs/lib_
 
 After build - commit all build files
 
@@ -106,4 +119,3 @@ git merge develop
 git push
 git checkout develop
 ```
-

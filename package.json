@@ -1,6 +1,6 @@
 {
-  "name": "timingsrc",
-  "version": "3.0.0",
+  "name": "webtimingsrc",
+  "version": "0.0.1",
   "description": "Javascript library for timing, synchronization and control in Web applications.",
   "main": "v3/index.js",
   "directories": {
@@ -16,19 +16,18 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "publishConfig": {
+    "registry": "https://registry.npm.alibaba-inc.com"
+  },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/webtiming/timingsrc.git"
+    "url": "git+https://github.com/homfen/timingsrc.git"
   },
-  "keywords": [
-    "timing",
-    "synchronization",
-    "mediacontrol"
-  ],
+  "keywords": ["timing", "synchronization", "mediacontrol"],
   "author": "Ingar Arntzen",
   "license": "SEE LICENSE IN LICENSE",
   "bugs": {
-    "url": "https://github.com/webtiming/timingsrc/issues"
+    "url": "https://github.com/homfen/timingsrc/issues"
   },
-  "homepage": "https://github.com/webtiming/timingsrc#readme"
+  "homepage": "https://github.com/homfen/timingsrc#readme"
 }
