@@ -1,20 +1,38 @@
 {
   "name": "@alife/timingsrc",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Javascript library for timing, synchronization and control in Web applications.",
-  "main": "v3/index.js",
+  "main": "dist/timingsrc.js",
   "directories": {
     "doc": "docs",
     "lib": "lib"
   },
   "dependencies": {},
   "devDependencies": {
+    "@babel/core": "^7.8.7",
+    "@babel/plugin-proposal-class-properties": "^7.8.3",
+    "@babel/plugin-proposal-decorators": "^7.8.3",
+    "@babel/plugin-proposal-export-default-from": "^7.8.3",
+    "@babel/plugin-proposal-export-namespace-from": "^7.8.3",
+    "@babel/plugin-proposal-object-rest-spread": "^7.9.5",
+    "@babel/plugin-transform-member-expression-literals": "^7.8.3",
+    "@babel/plugin-transform-object-assign": "^7.8.3",
+    "@babel/plugin-transform-property-literals": "^7.8.3",
+    "@babel/plugin-transform-runtime": "^7.9.0",
+    "@babel/plugin-transform-spread": "^7.8.3",
+    "@babel/plugin-transform-template-literals": "^7.8.3",
+    "@babel/plugin-transform-typescript": "^7.9.4",
+    "@babel/preset-env": "^7.8.7",
+    "babel-loader": "^8.1.0",
     "rollup": "^2.19.0",
     "rollup-plugin-terser": "^6.1.0",
-    "terser": "^4.8.0"
+    "terser": "^4.8.0",
+    "webpack": "^4.42.0",
+    "webpack-cli": "^3.3.11"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode production"
   },
   "publishConfig": {
     "registry": "https://registry.npm.alibaba-inc.com"
