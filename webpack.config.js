@@ -6,6 +6,7 @@ module.exports = {
   },
   output: {
     path: path.resolve('./dist'),
+    libraryTarget: 'umd',
   },
   module: {
     rules: [

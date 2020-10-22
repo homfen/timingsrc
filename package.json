@@ -1,6 +1,6 @@
 {
   "name": "@alife/timingsrc",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Javascript library for timing, synchronization and control in Web applications.",
   "main": "dist/timingsrc.js",
   "directories": {

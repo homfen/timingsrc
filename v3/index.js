@@ -19,10 +19,8 @@
 */
 
 // utils
-import * as utils from './util/utils.js';
-export {utils};
-import * as motionutils from './util/motionutils.js';
-export {motionutils};
+export * as utils from './util/utils.js';
+export * as motionutils from './util/motionutils.js';
 export {default as BinarySearch} from './util/binarysearch.js';
 export {default as endpoint} from './util/endpoint.js';
 export {default as eventify} from './util/eventify.js';
