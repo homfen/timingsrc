@@ -1,4 +1,3 @@
-
 /*
     Copyright 2020
     Author : Ingar Arntzen
@@ -20,8 +19,10 @@
 */
 
 // utils
-export * as utils from './util/utils.js';
-export * as motionutils from './util/motionutils.js';
+import * as utils from './util/utils.js';
+export {utils};
+import * as motionutils from './util/motionutils.js';
+export {motionutils};
 export {default as BinarySearch} from './util/binarysearch.js';
 export {default as endpoint} from './util/endpoint.js';
 export {default as eventify} from './util/eventify.js';
@@ -43,16 +44,15 @@ export {default as Dataset} from './sequencing/dataset.js';
 import {default as PointModeSequencer} from './sequencing/pointsequencer.js';
 import {default as IntervalModeSequencer} from './sequencing/intervalsequencer.js';
 
-
 /*
     Common constructor PointModeSequencer and IntervalModeSequencer
 */
 export function Sequencer(axis, toA, toB) {
-    if (toB === undefined) {
-        return new PointModeSequencer(axis, toA);
-    } else {
-        return new IntervalModeSequencer(axis, toA, toB);
-    }
-};
+  if (toB === undefined) {
+    return new PointModeSequencer(axis, toA);
+  } else {
+    return new IntervalModeSequencer(axis, toA, toB);
+  }
+}
 
-export const version = "v3.0";
+export const version = 'v3.0';
